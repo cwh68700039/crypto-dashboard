@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Dashboard - 实时行情</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -484,11 +485,18 @@
         
         // 渲染图表
         function renderChart(prices, coin) {
-            const ctx = document.getElementById('priceChart').getContext('2d');
+            const canvas = document.getElementById('priceChart');
             
+            // 完全销毁旧图表
             if (priceChart) {
                 priceChart.destroy();
+                priceChart = null;
             }
+            
+            // 重置 canvas
+            const newCanvas = canvas.cloneNode(true);
+            canvas.parentNode.replaceChild(newCanvas, canvas);
+            const ctx = newCanvas.getContext('2d');
             
             const color = coin === 'bitcoin' ? '#f7931a' : coin === 'ethereum' ? '#627eea' : '#00ffa3';
             
