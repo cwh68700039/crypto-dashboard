@@ -401,7 +401,7 @@
         // 获取实时价格
         async function fetchPrices() {
             try {
-                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true');
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true&x_cg_demo_api_key=' + COINGECKO_API_KEY);
                 const data = await response.json();
                 
                 updatePriceCard('bitcoin', data.bitcoin, 'btc');
@@ -428,6 +428,9 @@
             changeEl.className = 'change ' + changeClass;
         }
         
+        // API Key
+        const COINGECKO_API_KEY = 'CG-B7W36LyoRVw81onfbem6GPr9';
+        
         // 获取图表数据（带重试机制）
         async function fetchChartData(coin, days, retryCount = 0) {
             document.getElementById('chartLoading').style.display = 'flex';
@@ -440,7 +443,7 @@
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 }
                 
-                const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coin}/market_chart?vs_currency=usd&days=${days}`, {
+                const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coin}/market_chart?vs_currency=usd&days=${days}&x_cg_demo_api_key=${COINGECKO_API_KEY}`, {
                     headers: {
                         'Accept': 'application/json'
                     }
