@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .coin-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .btc-icon { background: #f7931a; color: white; }
+        .eth-icon { background: #627eea; color: white; }
+        .sol-icon { background: #00ffa3; color: #333; }
+        
+        .coin-info h3 {
+            font-size: 1.2em;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+        
+        .coin-info span {
+            font-size: 0.85em;
+            color: #999;
+        }
+        
+        .price {
+            font-size: 2em;
+            font-weight: 300;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        
+        .change {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .change.up {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .change.down {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .chart-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 40px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-header h2 {
+            font-size: 1.3em;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+        
+        .time-selector {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .time-btn {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .time-btn:hover {
+            background: #f5f5f5;
+        }
+        
+        .time-btn.active {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+        
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 1.1em;
+        }
+        
+        .alert-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .alert-section h2 {
+            font-size: 1.3em;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+        
+        .alert-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 6px;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+        
+        .btn-primary {
+            padding: 12px 24px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: #333;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .alert-form {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Crypto Dashboard</h1>
+            <p>实时加密货币行情监控</p>
+        </header>
+        
+        <div class="stats-grid">
+            <div class="card" onclick="selectCoin('BTC')">
+                <div class="card-header">
+                    <div class="coin-icon btc-icon">₿</div>
+                    <div class="coin-info">
+                        <h3>Bitcoin</h3>
+                        <span>BTC</span>
+                    </div>
+                </div>
+                <div class="price">$69,530.00</div>
+                <span class="change up">+0.15%</span>
+            </div>
+            
+            <div class="card" onclick="selectCoin('ETH')">
+                <div class="card-header">
+                    <div class="coin-icon eth-icon">Ξ</div>
+                    <div class="coin-info">
+                        <h3>Ethereum</h3>
+                        <span>ETH</span>
+                    </div>
+                </div>
+                <div class="price">$2,018.50</div>
+                <span class="change down">-0.85%</span>
+            </div>
+            
+            <div class="card" onclick="selectCoin('SOL')">
+                <div class="card-header">
+                    <div class="coin-icon sol-icon">S</div>
+                    <div class="coin-info">
+                        <h3>Solana</h3>
+                        <span>SOL</span>
+                    </div>
+                </div>
+                <div class="price">$142.30</div>
+                <span class="change up">+2.34%</span>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <div class="chart-header">
+                <h2>价格走势</h2>
+                <div class="time-selector">
+                    <button class="time-btn active">24H</button>
+                    <button class="time-btn">7D</button>
+                    <button class="time-btn">30D</button>
+                    <button class="time-btn">1Y</button>
+                </div>
+            </div>
+            <div class="chart-placeholder">
+                📈 图表区域（可接入实时数据）
+            </div>
+        </div>
+        
+        <div class="alert-section">
+            <h2>价格提醒设置</h2>
+            <form class="alert-form" onsubmit="setAlert(event)">
+                <div class="form-group">
+                    <label>币种</label>
+                    <select>
+                        <option>BTC</option>
+                        <option>ETH</option>
+                        <option>SOL</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>目标价格</label>
+                    <input type="number" placeholder="输入目标价格">
+                </div>
+                <button type="submit" class="btn-primary">设置提醒</button>
+            </form>
+        </div>
+        
+        <footer>
+            <p>数据来源：CoinGecko API | 最后更新：2026-03-11 19:55</p>
+        </footer>
+    </div>
+    
+    <script>
+        function selectCoin(coin) {
+            console.log('Selected:', coin);
+            // 切换图表数据
+        }
+        
+        function setAlert(e) {
+            e.preventDefault();
+            alert('提醒设置成功！');
+        }
+        
+        // 时间选择器交互
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
